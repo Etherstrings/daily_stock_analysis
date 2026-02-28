@@ -63,10 +63,12 @@ jobs:
           GEMINI_REQUEST_DELAY: '3.0'
           
           # AIHubMix（优先于 OPENAI_API_KEY，自动适配 base_url，推荐国内用户）
-          AIHUBMIX_KEY: ${{ secrets.AIHUBMIX_KEY }}
+          # 兼容用户误填到 Variables 的情况
+          AIHUBMIX_KEY: ${{ secrets.AIHUBMIX_KEY || vars.AIHUBMIX_KEY || secrets.OPENAI_API_KEY || vars.OPENAI_API_KEY }}
 
           # OpenAI 兼容 API（备选）
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          # 兼容用户误填到 Variables，及仅配置 AIHUBMIX_KEY 的情况
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY || vars.OPENAI_API_KEY || secrets.AIHUBMIX_KEY || vars.AIHUBMIX_KEY }}
           OPENAI_BASE_URL: ${{ vars.OPENAI_BASE_URL || secrets.OPENAI_BASE_URL }}
           OPENAI_MODEL: ${{ vars.OPENAI_MODEL || secrets.OPENAI_MODEL }}
 
@@ -182,6 +184,8 @@ jobs:
           echo "  AIHubMix Key:   $([ -n "$AIHUBMIX_KEY" ] && echo '✅ 已配置' || echo '⚪ 未配置')"
           echo "  OpenAI API Key: $([ -n "$OPENAI_API_KEY" ] && echo '✅ 已配置' || echo '⚪ 未配置')"
           echo "  Anthropic Key:  $([ -n "$ANTHROPIC_API_KEY" ] && echo '✅ 已配置' || echo '⚪ 未配置')"
+          echo "  AIHubMix len:   ${#AIHUBMIX_KEY}"
+          echo "  OpenAI len:     ${#OPENAI_API_KEY}"
           echo ""
           echo "【搜索引擎】"
           echo "  Bocha API Keys: $([ -n "$BOCHA_API_KEYS" ] && echo '✅ 已配置' || echo '⚪ 未配置')"
