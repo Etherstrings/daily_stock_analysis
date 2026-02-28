@@ -278,6 +278,15 @@ def run_full_analysis(
             logger.info(
                 "今日所有相关市场均为非交易日，跳过执行。可使用 --force-run 强制执行。"
             )
+            if not args.no_notify:
+                try:
+                    from src.notification import NotificationService
+                    NotificationService().send(
+                        "⚠️ 本次任务已跳过：今日所有相关市场均为非交易日。\n"
+                        "如需非交易日也执行，请使用 `--force-run` 或设置 `TRADING_DAY_CHECK_ENABLED=false`。"
+                    )
+                except Exception as notify_err:
+                    logger.warning(f"跳过执行通知发送失败: {notify_err}")
             return
         if set(filtered_codes) != set(effective_codes):
             skipped = set(effective_codes) - set(filtered_codes)

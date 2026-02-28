@@ -151,11 +151,19 @@ class NotificationService:
 
         # 微信消息类型配置
         self._wechat_msg_type = getattr(config, 'wechat_msg_type', 'markdown')
-        # Telegram 配置
+        # Telegram 配置（去除可能的首尾空白，避免 Secret 粘贴换行导致 404）
+        def _clean(v):
+            if v is None:
+                return None
+            if isinstance(v, str):
+                s = v.strip()
+                return s or None
+            return v
+
         self._telegram_config = {
-            'bot_token': getattr(config, 'telegram_bot_token', None),
-            'chat_id': getattr(config, 'telegram_chat_id', None),
-            'message_thread_id': getattr(config, 'telegram_message_thread_id', None),
+            'bot_token': _clean(getattr(config, 'telegram_bot_token', None)),
+            'chat_id': _clean(getattr(config, 'telegram_chat_id', None)),
+            'message_thread_id': _clean(getattr(config, 'telegram_message_thread_id', None)),
         }
         
         # 邮件配置
